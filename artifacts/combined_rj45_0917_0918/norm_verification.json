@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "frames": 951339,
+  "checks": [
+    "all modeled state means match exact frame-weighted source statistics",
+    "horizon-zero action means match shifted raw actions after configured relative joint transform"
+  ]
+}

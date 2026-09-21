@@ -1,0 +1,17 @@
+{
+  "dataset": "/mnt/cfs/7rnh3z/kele/0917/cleaned_rj45",
+  "frames": 535558,
+  "episodes": 1286,
+  "stats_downsample_rate": 1,
+  "action_horizon": 32,
+  "relative_joint_keys": [
+    "left_arm",
+    "right_arm"
+  ],
+  "inactive_action_keys": [
+    "right_arm",
+    "right_gripper"
+  ],
+  "source": "fresh computation from all cleaned parquet rows; no checkpoint statistics",
+  "stats_sha256": "022ff70e84490e2935b07b2673982641858626e31920c1b98045b9657657e744"
+}

@@ -1,0 +1,32 @@
+# @package _global_
+defaults:
+- r1pro
+- override /data: cleaned_rj45
+- _self_
+
+# 535,558 frames / 8 ranks / 16 samples per rank => 4,185 batches per epoch.
+# DistributedSampler pads two samples; the final batch contains eight samples.
+checkpointing_steps: 4185
+eval_steps: 4185
+batch_size_val: 4
+datastatics_path: /mnt/cfs/7rnh3z/kele/GalaxeaVLA/artifacts/cleaned_rj45_setup/dataset_stats.json
+resume_ckpt: null
+logger:
+  mode: offline
+  log_steps: 5
+model:
+  pretrained_ckpt: /mnt/cfs/7rnh3z/kele/GalaxeaVLA/base_checkpoint/g05-base/checkpoints/model_state_dict.pt
+  use_pretrained_norm_stats: false
+  enable_bf16_training: true
+  batch_size: 16
+  grad_accumulation_steps: 1
+  num_workers: 8
+  prefetch_factor: 2
+  max_epochs: 5
+  max_steps: null
+  model_arch:
+    hf_processor_path: /mnt/cfs/7rnh3z/kele/GalaxeaVLA/base_checkpoint/qwen3_5_2b_base_processor
+tokenizer:
+  vq_config:
+    ckpt_dir: /mnt/cfs/7rnh3z/kele/GalaxeaVLA/base_checkpoint/action_tokenizer.pt
+    dropout_noop_parts: true

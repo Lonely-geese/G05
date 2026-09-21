@@ -1,0 +1,9 @@
+{
+  "requested_global_batch_size": 256,
+  "selected_global_batch_size": 128,
+  "reason": "8-GPU batch 256 first training step failed with Triton Error [CUDA]: out of memory",
+  "observed_gpu_memory_mib": 79336,
+  "evidence": "smoke256.log",
+  "steps_per_epoch": 7433,
+  "epochs": 10
+}

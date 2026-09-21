@@ -1,0 +1,31 @@
+{
+  "status": "stopped_by_user",
+  "supervisor_pid": 367040,
+  "started_unix": 1789753965.7588463,
+  "global_batch_size": 128,
+  "per_gpu_batch_size": 16,
+  "gpu_count": 8,
+  "epochs": 10,
+  "steps_per_epoch": 7433,
+  "total_steps": 74330,
+  "output_dir": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/outputs/combined_rj45_0917_0918/left_arm_base_gbs128_ep10_20260919",
+  "log": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/artifacts/combined_rj45_0917_0918/train.log",
+  "checkpoint_by_epoch": {
+    "1": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/outputs/combined_rj45_0917_0918/left_arm_base_gbs128_ep10_20260919/checkpoints/step_7433.pt",
+    "2": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/outputs/combined_rj45_0917_0918/left_arm_base_gbs128_ep10_20260919/checkpoints/step_14866.pt",
+    "3": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/outputs/combined_rj45_0917_0918/left_arm_base_gbs128_ep10_20260919/checkpoints/step_22299.pt",
+    "4": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/outputs/combined_rj45_0917_0918/left_arm_base_gbs128_ep10_20260919/checkpoints/step_29732.pt",
+    "5": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/outputs/combined_rj45_0917_0918/left_arm_base_gbs128_ep10_20260919/checkpoints/step_37165.pt",
+    "6": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/outputs/combined_rj45_0917_0918/left_arm_base_gbs128_ep10_20260919/checkpoints/step_44598.pt",
+    "7": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/outputs/combined_rj45_0917_0918/left_arm_base_gbs128_ep10_20260919/checkpoints/step_52031.pt",
+    "8": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/outputs/combined_rj45_0917_0918/left_arm_base_gbs128_ep10_20260919/checkpoints/step_59464.pt",
+    "9": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/outputs/combined_rj45_0917_0918/left_arm_base_gbs128_ep10_20260919/checkpoints/step_66897.pt",
+    "10": "/mnt/cfs/7rnh3z/kele/GalaxeaVLA/outputs/combined_rj45_0917_0918/left_arm_base_gbs128_ep10_20260919/checkpoints/step_74330.pt"
+  },
+  "launcher_pid": 367041,
+  "returncode": 1,
+  "finished_unix": 1789754370.199122,
+  "all_epoch_checkpoints_exist": false,
+  "stopped_unix": 1789754394.0193317,
+  "note": "User requested stopping the agent-launched run and will launch training manually. No epoch checkpoints were saved."
+}

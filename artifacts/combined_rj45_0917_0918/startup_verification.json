@@ -1,0 +1,11 @@
+{
+  "status": "training_running",
+  "checked_unix": 1789754219.9374554,
+  "last_logged_epoch_zero_based": 0,
+  "last_logged_step_zero_based": 18,
+  "latest_loss": 5.5049,
+  "global_batch_size": 128,
+  "right_arm_tests": "4 passed",
+  "norm_verification": "passed",
+  "note": "First training steps checked; 10 epochs are still in progress."
+}

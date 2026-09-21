@@ -1,0 +1,13 @@
+{
+  "validation": "passed",
+  "training_steps": 3,
+  "world_size": 8,
+  "global_batch_size": 128,
+  "exit_code": 0,
+  "formal_training_started": false,
+  "losses": {
+    "0": 6.9502,
+    "1": 7.0577,
+    "2": 7.0883
+  }
+}
