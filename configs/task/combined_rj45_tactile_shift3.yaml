@@ -1,0 +1,53 @@
+# @package _global_
+defaults:
+  - combined_rj45_0917_0918
+  - override /data: combined_rj45_tactile_shift3
+  - _self_
+
+# Fresh statistics from THIS shift3 dataset. Do not reuse the shift1 baseline.
+datastatics_path: ${oc.env:G05_TACTILE_STATS,artifacts/combined_rj45_tactile_shift3/dataset_stats.json}
+checkpointing_steps: 2000
+eval_steps: 2000
+model:
+  # The RGB base checkpoint lacks touch weights: initialize new modules on CPU.
+  # Resume/evaluation from a complete tactile checkpoint can use meta loading.
+  use_meta_device: false
+  # FM-only leaves the VLM's final hidden-state-only parameters without loss.
+  find_unused_parameters: true
+  batch_size: 4
+  num_workers: 4
+  max_epochs: 10
+  processor:
+    _target_: g05.data_processor.processor.tactile_processor.TactileCoTProcessor
+    num_input_cameras: 3
+    num_output_cameras: 3
+    camera_size_config:
+      tactile_left_1: [224, 224]
+      tactile_left_2: [224, 224]
+  model_arch:
+    checkpoint_vlm: true
+    checkpoint_action_expert: true
+    # Touch conditions continuous flow matching; AR remains an optional RGB-only
+    # auxiliary loss, not a tactile action output. Train FM end-to-end by default.
+    discrete_action: false
+    continuous_action: true
+    fm:
+      joint_training: true
+      num_flow_samples: 1
+    tactile:
+      enabled: true
+      camera_keys: [tactile_left_1, tactile_left_2]
+      # Same image-sensor family, two contact sites. IDs are dataset-local;
+      # do not imply compatibility with FTP-1's global morphology numbering.
+      sensor_ids: [deeptouch, deeptouch]
+      area_ids: [0, 1]
+      num_areas: 2
+      image_size: [224, 224]
+      patch_size: 16
+      encoder_dim: 768
+      encoder_heads: 12
+      stem_depth: 3
+      trunk_depth: 9
+      hidden_size: 512
+      intermediate_size: 2048
+      gradient_checkpointing: true

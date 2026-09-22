@@ -1,0 +1,61 @@
+# Inherit raw joint layout and fixed-right-arm behavior from the RGB baseline.
+defaults:
+  - combined_rj45_0917_0918
+  - _self_
+
+# The dataset already contains source.action[t+3]; all time_offset stay ZERO.
+processors:
+  galaxea_r1pro:
+    shape_meta:
+      images:
+        - key: head_rgb
+          camera_type: exterior
+          lerobot_key: observation.images.headDepthCamera
+          start_index: 0
+          raw_shape: [3, 480, 848]
+          shape: [3, 256, 256]
+          time_offset: 0
+        - key: left_wrist_rgb
+          camera_type: wrist_left
+          lerobot_key: observation.images.leftCamera
+          start_index: 0
+          raw_shape: [3, 480, 848]
+          shape: [3, 256, 256]
+          time_offset: 0
+        - key: right_wrist_rgb
+          camera_type: wrist_right
+          lerobot_key: observation.images.rightCamera
+          start_index: 0
+          raw_shape: [3, 480, 848]
+          shape: [3, 256, 256]
+          time_offset: 0
+        - key: left_tactile_1
+          camera_type: tactile_left_1
+          modality: tactile
+          lerobot_key: observation.images.leftTactileCamera1
+          start_index: 0
+          raw_shape: [3, 1200, 750]
+          shape: [3, 224, 224]
+          time_offset: 0
+        - key: left_tactile_2
+          camera_type: tactile_left_2
+          modality: tactile
+          lerobot_key: observation.images.leftTactileCamera2
+          start_index: 0
+          raw_shape: [3, 1200, 750]
+          shape: [3, 224, 224]
+          time_offset: 0
+    train_transforms:
+      left_tactile_1: ${oc.load:configs/data/_transforms.yaml,val}
+      left_tactile_2: ${oc.load:configs/data/_transforms.yaml,val}
+    val_transforms:
+      left_tactile_1: ${oc.load:configs/data/_transforms.yaml,val}
+      left_tactile_2: ${oc.load:configs/data/_transforms.yaml,val}
+
+embodiment_datasets:
+  galaxea_r1pro:
+    shape_meta: ${data.processors.galaxea_r1pro.shape_meta}
+    dataset_groups:
+      - weight: 1.0
+        dataset_dirs:
+          - ${oc.env:TACTILE_DATASET_ROOT,/mnt/cfs/7rnh3z/kele/combined_rj45_tactile_0917_0921_shift3}

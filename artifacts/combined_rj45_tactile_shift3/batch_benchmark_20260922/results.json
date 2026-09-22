@@ -1,0 +1,32 @@
+[
+  {
+    "per_gpu_batch": 8,
+    "global_batch": 64,
+    "returncode": 0,
+    "steps": 30,
+    "all_losses_finite": true,
+    "gradient_count": 30,
+    "gradients_finite": true,
+    "min_gradient_norm": 1.5870219469070435,
+    "max_gradient_norm": 6.9203596115112305,
+    "sampled_peak_gpu_memory_gib": 63.052734375,
+    "seconds_per_step_steps11_30": 3.45,
+    "samples_per_second": 18.55072463768116,
+    "eval_snapshot_exists": true
+  },
+  {
+    "per_gpu_batch": 16,
+    "global_batch": 128,
+    "returncode": 0,
+    "steps": 30,
+    "all_losses_finite": true,
+    "gradient_count": 30,
+    "gradients_finite": true,
+    "min_gradient_norm": 1.6662571430206299,
+    "max_gradient_norm": 4.985833644866943,
+    "sampled_peak_gpu_memory_gib": 72.04296875,
+    "seconds_per_step_steps11_30": 6.25,
+    "samples_per_second": 20.48,
+    "eval_snapshot_exists": true
+  }
+]

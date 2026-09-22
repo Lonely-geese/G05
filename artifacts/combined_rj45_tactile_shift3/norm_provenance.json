@@ -1,0 +1,15 @@
+{
+  "dataset": "/mnt/cfs/7rnh3z/kele/combined_rj45_tactile_0917_0921_shift3",
+  "frames": 1006708,
+  "episodes": 3430,
+  "info_sha256": "0e46a415c61aa8a908f8eb68504e6e6c7213ddcad0b6fbc2338cee9695a3dcce",
+  "stats_downsample_rate": 1,
+  "action_horizon": 32,
+  "inactive_action_keys": [
+    "right_arm",
+    "right_gripper"
+  ],
+  "extra_time_offset": 0,
+  "stats_sha256": "735da3451f954a79bbe6ff744a9e0e742a3860d1c701f1b75086c444b05771e0",
+  "source": "fresh full-data parquet statistics; no base-checkpoint statistics"
+}

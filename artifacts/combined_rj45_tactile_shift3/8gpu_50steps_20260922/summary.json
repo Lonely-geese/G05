@@ -1,0 +1,70 @@
+{
+  "source_log": "/mnt/cfs/7rnh3z/kele/G05/artifacts/combined_rj45_tactile_shift3/8gpu_50steps_20260922.log",
+  "loss_kind": "all-reduced mean FM loss over all ranks; console precision 4 decimals",
+  "steps": 50,
+  "first": 0.493,
+  "last": 0.27,
+  "min": 0.1555,
+  "min_step": 47,
+  "max": 0.9611,
+  "mean": 0.412388,
+  "window_size": 10,
+  "first_window_mean": 0.58542,
+  "last_window_mean": 0.31684,
+  "window_mean_reduction_pct": 45.87817293567012,
+  "all_losses_finite": true,
+  "blocks": [
+    {
+      "steps": [
+        1,
+        10
+      ],
+      "mean": 0.58542,
+      "min": 0.4467,
+      "max": 0.9611
+    },
+    {
+      "steps": [
+        11,
+        20
+      ],
+      "mean": 0.48517,
+      "min": 0.3143,
+      "max": 0.7013
+    },
+    {
+      "steps": [
+        21,
+        30
+      ],
+      "mean": 0.36895,
+      "min": 0.2315,
+      "max": 0.436
+    },
+    {
+      "steps": [
+        31,
+        40
+      ],
+      "mean": 0.30556,
+      "min": 0.2009,
+      "max": 0.428
+    },
+    {
+      "steps": [
+        41,
+        50
+      ],
+      "mean": 0.31684,
+      "min": 0.1555,
+      "max": 0.7412
+    }
+  ],
+  "grad_norm_before_clipping": {
+    "count": 50,
+    "all_finite": true,
+    "min": 1.1132702827453613,
+    "max": 9.5735502243042,
+    "last": 3.416799545288086
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "pytest_passed": 11,
+  "ddp_ranks": 2,
+  "updates_per_rank": 10,
+  "workers_per_rank": 8,
+  "pin_threads_per_rank": 2,
+  "ddp_returncode": 0,
+  "shutdown_errors": [],
+  "rank_results": [
+    "rank=0: 10 updates + eval; 8 workers and 2 pin threads stopped",
+    "rank=1: 10 updates + eval; 8 workers and 2 pin threads stopped"
+  ]
+}

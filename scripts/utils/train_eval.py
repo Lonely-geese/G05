@@ -9,6 +9,7 @@ import time
 
 import torch.distributed as dist
 
+from utils.dataloader_lifecycle import ManagedDataLoaderIterator
 from utils.eval_snapshot import save_eval_snapshot
 from utils.metric import (
     reduce_payload,
@@ -28,14 +29,18 @@ class PeriodicEvaluator:
         self.eval_processor = eval_processor
         self.parts_meta = parts_meta
         self.output_dir = output_dir
-        self._iter = iter(eval_dataloader)
+        self._iter = ManagedDataLoaderIterator(eval_dataloader)
+
+    def close(self):
+        """Stop prefetching before tracker/distributed/interpreter teardown."""
+        self._iter.close()
 
     def _next_batch(self):
         try:
             return next(self._iter)
         except StopIteration:
             self.eval_sampler.set_epoch(self.eval_sampler.epoch + 1)
-            self._iter = iter(self.eval_dataloader)
+            self._iter.reset()
             return next(self._iter)
 
     def evaluate(self, model, accelerator, step: int, eval_batch=None) -> dict:

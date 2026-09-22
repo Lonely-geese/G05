@@ -55,6 +55,26 @@ class G05ModelQwen35(G05Model):
     def __init__(self, cfg):
         super().__init__(cfg)
         self._cached_image_grid_thw = None  # image_grid_thw cache required by MRoPE
+        self.tactile_branch = None
+        tactile_cfg = cfg.get("tactile")
+        if tactile_cfg and tactile_cfg.get("enabled", False):
+            from .tactile import TactileBranch
+
+            if cfg.get("ae_vlm_condition_mode", "both") == "recurrent_only":
+                raise ValueError("Tactile conditioning requires action KV cross-attention")
+            if any(t != "full_attention" for t in cfg.action_expert.layer_types):
+                raise ValueError("Tactile branch currently requires a full-attention action expert")
+            self.tactile_branch = TactileBranch(tactile_cfg, cfg.action_expert)
+
+    def prepare_action_context(self, cache, mask, positions, tactile_pixel_values=None):
+        if self.tactile_branch is None:
+            if tactile_pixel_values is not None:
+                raise ValueError("Tactile inputs supplied to a model without a tactile branch")
+            return cache, mask, positions
+        from .tactile import append_tactile_context
+
+        tactile_cache, tactile_positions = self.tactile_branch(tactile_pixel_values, mask, positions)
+        return append_tactile_context(cache, tactile_cache, mask, positions, tactile_positions)
 
     # ------------------------------------------------------------------
     # from_pretrained: Qwen3.5 weight loading
@@ -484,6 +504,7 @@ class G05ModelQwen35(G05Model):
             dtype,
             action_op_mask=action_op_mask,
             embodiment_types=kwargs.get("embodiment_types"),
+            tactile_pixel_values=kwargs.get("tactile_pixel_values"),
         )
 
         if not continuous_action:

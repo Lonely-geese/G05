@@ -128,6 +128,7 @@ class GalaxeaCoTProcessor(FullProcessor):
         image_sizes = {
             meta["key"]: (meta["shape"][1], meta["shape"][2])
             for meta in (self.shape_meta.get("images") or [])
+            if meta.get("modality", "visual") == "visual"
         }
         builder_cls = samples_builder or BaseSamplesBuilder
         self.samples_builder = builder_cls(

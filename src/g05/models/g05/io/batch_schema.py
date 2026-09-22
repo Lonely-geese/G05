@@ -36,6 +36,8 @@ class G05TrainBatch:
     # [B, D] bool. False means the semantic action dimension is inactive and
     # should be excluded from action tokenization and continuous-action loss.
     action_op_mask: Optional[torch.Tensor] = None
+    # Separate touch images, never VLM slots: camera -> [B, T, 3, H, W], [-1, 1].
+    tactile_pixel_values: Optional[Dict[str, torch.Tensor]] = None
     # Per-sample source metadata (idx/task/embodiment/dataset_locator/frequency),
     # collected by collate_fn_pad_sequences for diagnostics and logging only.
     sample_meta: List[Dict[str, Any]] = field(default_factory=list)
@@ -54,3 +56,4 @@ class G05InferenceBatch:
     # Optional GT action, only for eval comparison with predictions.
     action: Optional[torch.Tensor] = None
     action_dim_is_pad: Optional[torch.Tensor] = None
+    tactile_pixel_values: Optional[Dict[str, torch.Tensor]] = None

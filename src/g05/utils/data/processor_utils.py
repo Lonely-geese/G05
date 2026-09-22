@@ -173,7 +173,10 @@ def instantiate_dataset(cfg: DictConfig, **kwargs):
     _STRIP_KEYS = ("processors", "processor_overrides", "allow_emb_target_override")
     if any(data_cfg.get(k, None) is not None for k in _STRIP_KEYS):
         OmegaConf.set_struct(data_cfg, False)
+        # Resolve while the original root/processor nodes still exist. Dataset
+        # shape_meta may reference data.processors; stripping first loses it.
+        resolved_data = OmegaConf.to_container(data_cfg, resolve=True)
         data_cfg = OmegaConf.create(
-            {k: v for k, v in data_cfg.items() if k not in _STRIP_KEYS}
+            {k: v for k, v in resolved_data.items() if k not in _STRIP_KEYS}
         )
     return instantiate(data_cfg, **kwargs)

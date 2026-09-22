@@ -859,7 +859,7 @@ class FullProcessor(ActionProcessor):
         processor = AutoProcessor.from_pretrained(**tokenizer_params)
         return processor.tokenizer
 
-    def process_images(self, data: Dict[str, Any]) -> Dict[str, torch.Tensor]:
+    def process_images(self, data: Dict[str, Any], modality=None) -> Dict[str, torch.Tensor]:
         """Process images through transforms.
 
         Returns:
@@ -869,6 +869,8 @@ class FullProcessor(ActionProcessor):
         """
         result: Dict[str, torch.Tensor] = {}
         for meta in self.shape_meta["images"]:
+            if modality is not None and meta.get("modality", "visual") != modality:
+                continue
             key, shape = meta["key"], meta["shape"]
             image = data["images"][key]  # [num_obs_steps, C, H, W]
             assert image.ndim == 4, (

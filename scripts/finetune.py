@@ -7,7 +7,7 @@ import signal
 import logging
 import time
 
-from contextlib import nullcontext
+from contextlib import closing, nullcontext
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -69,6 +69,7 @@ from utils.metric import resolve_parts_meta
 from utils.preflight import build_filter_str, run_preflight_checks
 from utils.eval_snapshot import save_train_snapshot
 from utils.train_eval import PeriodicEvaluator
+from utils.dataloader_lifecycle import ManagedDataLoaderIterator
 
 register_default_resolvers()
 
@@ -571,6 +572,7 @@ def finetune(cfg: DictConfig):
             extra_prefixes=["normalizer."],
             eval_mode=False,
             return_full_checkpoint=True,
+            use_meta_device=cfg.model.get("use_meta_device", True),
         )
     else:
         model: BasePolicy = instantiate(cfg.model.model_arch)
@@ -1118,7 +1120,14 @@ def finetune(cfg: DictConfig):
     # Train!
     logger.info("Starting training...")
     training_done = False
-    with tqdm.tqdm(initial=step, total=max_steps, leave=False, dynamic_ncols=True) as progress:
+    # Close iterators on this thread even on early break or training/eval errors.
+    # Do this before final checkpoint/tracker/distributed teardown, rather than
+    # relying on GC while workers and resource-sharer sockets are exiting.
+    with (
+        closing(evaluator),
+        ManagedDataLoaderIterator(train_dataloader) as train_iterator,
+        tqdm.tqdm(initial=step, total=max_steps, leave=False, dynamic_ncols=True) as progress,
+    ):
         latest_action_eval_batch = None
         _period_train_start = time.time()
         while not training_done:
@@ -1137,7 +1146,7 @@ def finetune(cfg: DictConfig):
                 batch_idx = 0
                 train_sampler.set_start_batch(0)
 
-            data_iter = iter(train_dataloader)
+            data_iter = train_iterator.reset()
             model.train()
             optimizer.zero_grad(set_to_none=True)
             while batch_idx < len(train_dataloader):

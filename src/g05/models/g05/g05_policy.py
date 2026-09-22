@@ -59,6 +59,7 @@ class InferenceState:
     device: torch.device = None
     generated_texts: Optional[List[str]] = None
     generated_ids: Optional[torch.Tensor] = None
+    tactile_pixel_values: Optional[Dict[str, torch.Tensor]] = None
 
     def check_invariants(self, where: str = "") -> None:
         from .model.utils import kv_cache_seq_len
@@ -583,6 +584,7 @@ class G05Policy(BasePolicy):
                 pixel_values=batch["pixel_values"],
                 actions=batch.get("action"),
                 action_dim_is_pad=batch.get("action_dim_is_pad"),
+                tactile_pixel_values=batch.get("tactile_pixel_values"),
             )
             batch.update(generated)
             self.model.train(was_training)
@@ -595,6 +597,7 @@ class G05Policy(BasePolicy):
                 action_pad_masks=batch.get("action_is_pad"),
                 action_dim_is_pad=batch.get("action_dim_is_pad"),
                 action_op_mask=batch.get("action_op_mask"),
+                tactile_pixel_values=batch.get("tactile_pixel_values"),
             )
 
     # ------------------------------------------------------------------
@@ -700,6 +703,7 @@ class G05Policy(BasePolicy):
             ),
             proprio=proprio_batch,
             embodiment_types=embodiment_types,
+            tactile_pixel_values=kwargs.get("tactile_pixel_values"),
         )
 
         overall_accuracy = loss_dict.pop("overall_accuracy", 0.0)
@@ -759,6 +763,7 @@ class G05Policy(BasePolicy):
         self,
         samples: List[Dict[str, Any]],
         pixel_values: Union[torch.Tensor, Dict[str, torch.Tensor]],
+        tactile_pixel_values: Optional[Dict[str, torch.Tensor]] = None,
     ) -> InferenceState:
         """Stage 1: encode text/images + VLM prefill -> KV cache.
 
@@ -808,6 +813,7 @@ class G05Policy(BasePolicy):
             pixel_values=pixel_values_processed,
             input_ids=input_ids,
             device=device,
+            tactile_pixel_values=tactile_pixel_values,
         )
         state.check_invariants(where="prefill")
         return state
@@ -904,6 +910,7 @@ class G05Policy(BasePolicy):
                 action_dim_is_pad=action_dim_is_pad,
                 position_ids_override=state.position_ids,
                 embodiment_types=[s.get("embodiment") for s in samples],
+                tactile_pixel_values=state.tactile_pixel_values,
             )
             _sync_if_cuda_available()
             timing["fm_action_ms"] = (time.monotonic() - t_fm0) * 1000.0
@@ -1024,7 +1031,9 @@ class G05Policy(BasePolicy):
 
         # Stage 1: Prefill
         t0 = time.monotonic()
-        state = self.prefill(samples, pixel_values)
+        tactile = kwargs.get("tactile_pixel_values")
+        state = (self.prefill(samples, pixel_values, tactile_pixel_values=tactile)
+                 if tactile is not None else self.prefill(samples, pixel_values))
         _sync_if_cuda_available()
         timing["prefill_ms"] = (time.monotonic() - t0) * 1000.0
 

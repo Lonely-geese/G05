@@ -265,6 +265,7 @@ class FMHelper:
         dtype: torch.dtype,
         action_op_mask=None,
         embodiment_types: list = None,
+        tactile_pixel_values=None,
     ) -> torch.Tensor:
         """Single FM training step.
 
@@ -294,6 +295,18 @@ class FMHelper:
                 dim_mask = action_dim_is_pad.unsqueeze(1).expand(-1, x1.size(1), -1)
                 x1[dim_mask] = 0.0
 
+        # Detach only VLM KV when requested. Newly trained tactile K/V must keep
+        # their gradient graph even when fm.joint_training=False.
+        if not self.joint_training:
+            if isinstance(vlm_kv_prefix, SparseKVCache):
+                vlm_kv_prefix = vlm_kv_prefix.detach()
+            else:
+                vlm_kv_prefix = [(k.detach(), v.detach()) for k, v in vlm_kv_prefix]
+        if hasattr(model, "prepare_action_context"):
+            vlm_kv_prefix, attention_mask_prefix, position_ids_prefix = model.prepare_action_context(
+                vlm_kv_prefix, attention_mask_prefix, position_ids_prefix, tactile_pixel_values
+            )
+
         # Build action mask + position_ids (shared across all flow samples)
         prefix_len = attention_mask_prefix.size(1)
         action_mask, action_pos = model.build_action_mask_and_position_ids(
@@ -304,14 +317,6 @@ class FMHelper:
             dtype=dtype,
             action_causal=self.action_causal,
         )
-
-        # Detach vlm_kv_prefix if not joint training (shared across all flow samples)
-        if isinstance(vlm_kv_prefix, SparseKVCache):
-            if not self.joint_training:
-                vlm_kv_prefix = vlm_kv_prefix.detach()
-        else:
-            if not self.joint_training:
-                vlm_kv_prefix = [(k.detach(), v.detach()) for k, v in vlm_kv_prefix]
 
         ae_dtype = model.action_expert.layers[0].mlp.gate_proj.weight.dtype
         N = self.num_flow_samples
@@ -439,6 +444,19 @@ class FMHelper:
         if _pad_mask is not None:
             action.masked_fill_(_pad_mask, 0.0)
 
+        # Prepare the same [visual | tactile] context used for training, once
+        # outside the denoising loop. Never slice a merged sparse cache by
+        # num_items(): tactile-only layers have shorter prefixes than VLM layers.
+        if hasattr(model, "_build_prefix_action_kv"):
+            ae_cache = model._build_prefix_action_kv(vlm_kv, attention_mask.size(1))
+            if hasattr(model, "prepare_action_context"):
+                ae_cache, attention_mask, position_ids = model.prepare_action_context(
+                    ae_cache, attention_mask, position_ids, kwargs.get("tactile_pixel_values")
+                )
+            ae_kv_kwargs = {"kv_cache": ae_cache}
+        else:
+            ae_kv_kwargs = {"past_key_values": past_key_values}
+
         # Build action mask + position_ids
         action_mask, action_pos = model.build_action_mask_and_position_ids(
             attention_mask,
@@ -451,11 +469,6 @@ class FMHelper:
 
         # Build AE KV kwargs once — return_kv_cache=False means prefix_kv is never
         # modified by the AE forward, so the same object is safe to reuse across all steps.
-        if hasattr(model, "_build_prefix_action_kv"):
-            ae_kv_kwargs = {"kv_cache": model._build_prefix_action_kv(vlm_kv, vlm_kv.num_items())}
-        else:
-            ae_kv_kwargs = {"past_key_values": past_key_values}
-
         # Euler integration
         delta_t = 1.0 / self.num_inference_steps
         if self.time_convention == "pi_convention":
